@@ -69,6 +69,6 @@ class FreeEC2Stack extends Stack {
 
 if (require.main === module) {
   const app = new cdk.App()
-  new FreeEC2Stack(app, 'FreeEC2Stack', { env: { region: 'eu-west-1' } })
+  new FreeEC2Stack(app, 'FreeEC2Stack', { env: { region: process.env.AWS_REGION ?? 'eu-west-1' } })
   app.synth()
 }
