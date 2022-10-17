@@ -7,8 +7,11 @@ import { Construct } from 'constructs'
 
 function makeConnectScript (keyId: string, publicIp: string): string {
   return `#!/usr/bin/env bash
+set -eu
+
 if [ ! -f "${keyId}.pem" ]; then
-  env-cmd aws ssm get-parameter --name /ec2/keypair/${keyId} --query Parameter.Value --with-decryption --output text > "${keyId}.pem"
+  CONTENT=$(env-cmd aws ssm get-parameter --name /ec2/keypair/${keyId} --query Parameter.Value --with-decryption --output text)
+  echo "$CONTENT" > "${keyId}.pem"
   chmod 400 "${keyId}.pem"
 fi
 
