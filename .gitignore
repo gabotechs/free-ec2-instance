@@ -11,3 +11,7 @@
 !.yarn/versions
 
 .env
+/cdk.out
+cdk-output.json
+connect.sh
+*.pem
