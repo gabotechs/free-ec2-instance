@@ -5,8 +5,10 @@
   "author": "Gabriel Musat",
   "license": "MIT",
   "scripts": {
-    "deploy": "",
-    "destroy": ""
+    "deploy": "env-cmd --silent cdk deploy --outputs-file cdk-output.json && ts-node src/processCdkOutput.ts && chmod +x connect.sh",
+    "connect": "./connect.sh",
+    "bootstrap": "env-cmd --silent cdk bootstrap",
+    "destroy": "env-cmd --silent cdk destroy"
   },
   "files": [
     "lib",
@@ -40,9 +42,11 @@
   },
   "dependencies": {
     "@types/node": "^18.11.0",
+    "aws-cdk": "^2.46.0",
     "aws-cdk-lib": "^2.46.0",
     "constructs": "^10.1.131",
-    "dotenv": "^16.0.3",
+    "env-cmd": "^10.1.0",
+    "ts-node": "^10.9.1",
     "typescript": "^4.8.4"
   }
 }

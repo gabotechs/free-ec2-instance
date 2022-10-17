@@ -4,7 +4,16 @@ import * as cdk from 'aws-cdk-lib'
 import * as ec2 from 'aws-cdk-lib/aws-ec2'
 import * as iam from 'aws-cdk-lib/aws-iam'
 import { Construct } from 'constructs'
-import dotenv from 'dotenv'
+
+function makeConnectScript (keyId: string, publicIp: string): string {
+  return `#!/usr/bin/env bash
+if [ ! -f "${keyId}.pem" ]; then
+  env-cmd aws ssm get-parameter --name /ec2/keypair/${keyId} --query Parameter.Value --with-decryption --output text > "${keyId}.pem"
+  chmod 400 "${keyId}.pem"
+fi
+
+ssh -i ${keyId}.pem -o IdentitiesOnly=yes ec2-user@${publicIp}`
+}
 
 class FreeEC2Stack extends Stack {
   constructor (scope: Construct, id: string, props?: StackProps) {
@@ -39,24 +48,24 @@ class FreeEC2Stack extends Stack {
 
     const instanceType = ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.MICRO)
 
+    const cfnKeyPair = new ec2.CfnKeyPair(this, 'FreeEc2Keypair', {
+      keyName: 'free-ec2-keypair'
+    })
+
     const ec2Instance = new ec2.Instance(this, 'FreeEC2Instance', {
       vpc,
       instanceType,
       securityGroup,
-      machineImage
+      machineImage,
+      keyName: cfnKeyPair.keyName
     })
 
-    // Create outputs for connecting
-    new cdk.CfnOutput(this, 'IP Address', { value: ec2Instance.instancePublicIp })
-    // new cdk.CfnOutput(this, 'Key Name', { value: key.keyPairName })
-    new cdk.CfnOutput(this, 'Download Key Command', { value: 'aws secretsmanager get-secret-value --secret-id ec2-ssh-key/cdk-keypair/private --query SecretString --output text > cdk-key.pem && chmod 400 cdk-key.pem' })
-    new cdk.CfnOutput(this, 'ssh command', { value: 'ssh -i cdk-key.pem -o IdentitiesOnly=yes ec2-user@' + ec2Instance.instancePublicIp })
+    new cdk.CfnOutput(this, 'Connect Script', { value: makeConnectScript(cfnKeyPair.attrKeyPairId, ec2Instance.instancePublicIp) })
   }
 }
 
 if (require.main === module) {
-  dotenv.config()
   const app = new cdk.App()
-  new FreeEC2Stack(app, 'FreeEC2Stack', {})
+  new FreeEC2Stack(app, 'FreeEC2Stack', { env: { region: 'eu-west-1' } })
   app.synth()
 }
