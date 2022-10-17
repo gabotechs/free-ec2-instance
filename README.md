@@ -11,6 +11,7 @@ yarn install
 create a `.env` file with your credentials in the root of the project, 
 next to the `package.json` file
 ```dotenv
+AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=your-access-key-id
 AWS_SECRET_ACCESS_KEY=your-access-key-secret
 ```
