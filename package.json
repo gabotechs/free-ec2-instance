@@ -30,7 +30,7 @@
     "amazon",
     "server"
   ],
-  "packageManager": "yarn@3.2.4",
+  "packageManager": "yarn@3.5.0",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.40.0",
     "eslint": "^8.25.0",
