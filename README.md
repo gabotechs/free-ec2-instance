@@ -2,7 +2,18 @@
 
 Deploy an instance in AWS for you to play around.
 
+> **NOTE**: ⚠️ This project will deploy a t4g.micro ec2 instance
+in the configured account, last time I checked, that was free, but
+make sure to check it again.
+
 ## Install
+
+Clone the project
+
+```shell
+git clone https://github.com/gabotechs/free-ec2-instance
+cd free-ec2-instance
+```
 
 Install the dependencies
 ```shell
@@ -34,3 +45,9 @@ Whenever you want to tear down the EC2 instance just use:
 ```shell
 yarn destroy
 ```
+
+## Disclaimer
+
+> **NOTE**: ⚠️ The contributors of this project are not responsible for
+costs created in your AWS account, people that use this project are responsible for
+their own AWS costs.
