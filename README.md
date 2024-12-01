@@ -17,7 +17,7 @@ cd free-ec2-instance
 
 Install the dependencies
 ```shell
-yarn install
+npm install
 ```
 create a `.env` file with your credentials in the root of the project, 
 next to the `package.json` file
@@ -31,19 +31,19 @@ AWS_SECRET_ACCESS_KEY=your-access-key-secret
 
 Deploy the new EC2 instance
 ```shell
-yarn deploy
+npm run deploy
 ```
 It should take a couple of minutes. After the deployment is completed,
 you can connect to your instance with:
 ```shell
-yarn connect
+npm run connect
 ```
 
 ## Destroy
 
 Whenever you want to tear down the EC2 instance just use:
 ```shell
-yarn destroy
+npm run destroy
 ```
 
 ## Disclaimer
