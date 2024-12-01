@@ -18,7 +18,6 @@ fi
 ssh -i ${keyId}.pem -o IdentitiesOnly=yes ec2-user@${publicIp}`
 }
 
-
 function makeScpScript (keyId: string, publicIp: string): string {
   return `#!/usr/bin/env bash
 set -eu
@@ -32,11 +31,11 @@ fi
 scp -i ${keyId}.pem -o IdentitiesOnly=yes "$1" ec2-user@${publicIp}:"$2"`
 }
 
-class FreeEC2Stack extends Stack {
+class NvidiaRapidsEC2Stack extends Stack {
   constructor (scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props)
 
-    const vpc = new ec2.Vpc(this, 'FreeEC2VPC', {
+    const vpc = new ec2.Vpc(this, 'NvidiaRapidsEC2VPC', {
       natGateways: 0,
       subnetConfiguration: [{
         cidrMask: 24,
@@ -58,18 +57,18 @@ class FreeEC2Stack extends Stack {
 
     role.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'))
 
-    const machineImage = new ec2.AmazonLinuxImage({
-      generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
-      cpuType: ec2.AmazonLinuxCpuType.ARM_64
+    const machineImage = new ec2.GenericLinuxImage({
+      // https://aws.amazon.com/marketplace/server/configuration?productId=676eed8d-dcf5-4784-87d7-0de463205c17&ref_=psb_cfg_continue
+      'us-east-1': 'ami-06835d15c4de57810'
     })
 
-    const instanceType = ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.MICRO)
+    const instanceType = ec2.InstanceType.of(ec2.InstanceClass.G4DN, ec2.InstanceSize.XLARGE)
 
-    const cfnKeyPair = new ec2.CfnKeyPair(this, 'FreeEc2Keypair', {
-      keyName: 'free-ec2-keypair'
+    const cfnKeyPair = new ec2.CfnKeyPair(this, 'NvidiaRapidsEc2Keypair', {
+      keyName: 'nvidia-rapids-ec2-keypair'
     })
 
-    const ec2Instance = new ec2.Instance(this, 'FreeEC2Instance', {
+    const ec2Instance = new ec2.Instance(this, 'NvidiaRapidsEC2Instance', {
       vpc,
       instanceType,
       securityGroup,
@@ -84,6 +83,6 @@ class FreeEC2Stack extends Stack {
 
 if (require.main === module) {
   const app = new cdk.App()
-  new FreeEC2Stack(app, 'FreeEC2Stack', { env: { region: process.env.AWS_REGION ?? 'us-east-1' } })
+  new NvidiaRapidsEC2Stack(app, 'NvidiaRapidsEC2Stack', { env: { region: process.env.AWS_REGION ?? 'us-east-1' } })
   app.synth()
 }
