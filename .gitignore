@@ -13,4 +13,5 @@
 /cdk.out
 cdk-output.json
 connect.sh
+scp.sh
 *.pem

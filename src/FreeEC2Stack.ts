@@ -10,12 +10,26 @@ function makeConnectScript (keyId: string, publicIp: string): string {
 set -eu
 
 if [ ! -f "${keyId}.pem" ]; then
-  CONTENT=$(env-cmd aws ssm get-parameter --name /ec2/keypair/${keyId} --query Parameter.Value --with-decryption --output text)
+  CONTENT=$(env-cmd --silent aws ssm get-parameter --name /ec2/keypair/${keyId} --query Parameter.Value --with-decryption --output text)
   echo "$CONTENT" > "${keyId}.pem"
   chmod 400 "${keyId}.pem"
 fi
 
 ssh -i ${keyId}.pem -o IdentitiesOnly=yes ec2-user@${publicIp}`
+}
+
+
+function makeScpScript (keyId: string, publicIp: string): string {
+  return `#!/usr/bin/env bash
+set -eu
+
+if [ ! -f "${keyId}.pem" ]; then
+  CONTENT=$(env-cmd --silent aws ssm get-parameter --name /ec2/keypair/${keyId} --query Parameter.Value --with-decryption --output text)
+  echo "$CONTENT" > "${keyId}.pem"
+  chmod 400 "${keyId}.pem"
+fi
+
+scp -i ${keyId}.pem -o IdentitiesOnly=yes "$1" ec2-user@${publicIp}:"$2"`
 }
 
 class FreeEC2Stack extends Stack {
@@ -64,11 +78,12 @@ class FreeEC2Stack extends Stack {
     })
 
     new cdk.CfnOutput(this, 'Connect Script', { value: makeConnectScript(cfnKeyPair.attrKeyPairId, ec2Instance.instancePublicIp) })
+    new cdk.CfnOutput(this, 'Scp Script', { value: makeScpScript(cfnKeyPair.attrKeyPairId, ec2Instance.instancePublicIp) })
   }
 }
 
 if (require.main === module) {
   const app = new cdk.App()
-  new FreeEC2Stack(app, 'FreeEC2Stack', { env: { region: process.env.AWS_REGION ?? 'eu-west-1' } })
+  new FreeEC2Stack(app, 'FreeEC2Stack', { env: { region: process.env.AWS_REGION ?? 'us-east-1' } })
   app.synth()
 }

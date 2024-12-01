@@ -5,9 +5,10 @@
   "author": "Gabriel Musat",
   "license": "MIT",
   "scripts": {
-    "deploy": "env-cmd --silent cdk bootstrap && env-cmd --silent cdk deploy --outputs-file cdk-output.json && ts-node src/processCdkOutput.ts && chmod +x connect.sh",
+    "deploy": "env-cmd --silent cdk bootstrap && env-cmd --silent cdk deploy --outputs-file cdk-output.json && ts-node src/processCdkOutput.ts && chmod +x connect.sh && chmod +x scp.sh",
     "destroy": "env-cmd --silent cdk destroy",
-    "connect": "./connect.sh"
+    "connect": "TERM=xterm ./connect.sh",
+    "scp": "./scp.sh"
   },
   "files": [
     "lib",
