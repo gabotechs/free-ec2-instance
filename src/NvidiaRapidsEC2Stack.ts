@@ -15,7 +15,7 @@ if [ ! -f "${keyId}.pem" ]; then
   chmod 400 "${keyId}.pem"
 fi
 
-ssh -i ${keyId}.pem -o IdentitiesOnly=yes ec2-user@${publicIp}`
+ssh -i ${keyId}.pem -o IdentitiesOnly=yes ubuntu@${publicIp}`
 }
 
 function makeScpScript (keyId: string, publicIp: string): string {
@@ -28,7 +28,7 @@ if [ ! -f "${keyId}.pem" ]; then
   chmod 400 "${keyId}.pem"
 fi
 
-scp -i ${keyId}.pem -o IdentitiesOnly=yes "$1" ec2-user@${publicIp}:"$2"`
+scp -i ${keyId}.pem -o IdentitiesOnly=yes "$1" ubuntu@${publicIp}:"$2"`
 }
 
 class NvidiaRapidsEC2Stack extends Stack {
